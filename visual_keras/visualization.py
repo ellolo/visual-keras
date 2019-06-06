@@ -181,7 +181,7 @@ def viz_class_score_maximizer(model, class_idx, img_size=(224, 224, 3), fig_size
     imge = np.stack([imge], axis=3)  # shape format: (H, W, C, F)
     grid = visual_grid_4d_rgb(imge, pixel_transform="standardized")
     plt.figure(figsize=fig_size)
-    plt.title("Class " + str(class_idx) + " maximizer: " + layer_name, fontsize=20)
+    plt.title("Class " + str(class_idx), fontsize=20)
     plt.imshow(grid)
     plt.show()
 
