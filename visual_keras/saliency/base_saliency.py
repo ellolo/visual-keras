@@ -1,5 +1,7 @@
-from keras import backend as K
 import numpy as np
+from keras import backend as K
+from keras.layers import Conv2D
+from keras.layers.pooling import _Pooling2D
 from .saliency_map import AbstractSaliencyMap
 from ..utils import floats_to_pixels_standardized
 
@@ -7,6 +9,10 @@ from ..utils import floats_to_pixels_standardized
 class BaseSaliencyMap(AbstractSaliencyMap):
     
     def __init__(self, model, layer_name=None, multiply=False):
+        if layer_name is not None:
+            layer = model.get_layer(layer_name)
+            if not isinstance(layer, Conv2D) and not isinstance(layer, _Pooling2D):
+                raise ValueError("Layer {} is not 2d convolutional or 2d pooling".format(layer_name))
         super(BaseSaliencyMap, self).__init__(model, multiply)
         self.layer_name = layer_name
         if layer_name is None:

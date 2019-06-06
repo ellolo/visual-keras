@@ -1,18 +1,28 @@
-from keras import backend as K
 import numpy as np
+from keras.layers import Conv2D, Dense
+from keras.layers.pooling import _Pooling2D
+from keras import backend as K
 from .saliency_map import AbstractSaliencyMap
-from ..utils import floats_to_pixels_standardized
+from ..utils import floats_to_pixels_standardized, remove_last_layer_activation
 
 
 class GradCamMap(AbstractSaliencyMap):
     
     def __init__(self, model, layer_name=None, multiply=False):
+        if layer_name is not None:
+            layer = model.get_layer(layer_name)
+            if not isinstance(layer, Conv2D) and not isinstance(layer, _Pooling2D):
+                raise ValueError("Layer {} is not 2d convolutional or 2d pooling".format(layer_name))
         super(GradCamMap, self).__init__(model, multiply)
         self.layer_name = layer_name
         if layer_name is None:
             self.layer_is_image = True
         else:
             self.layer_is_image = False
+        # if the last layer is dense we need to remove the final activation function as required by Grad Cam
+        last_layer = self.model.layers[-1]
+        if isinstance(last_layer, Dense):
+            self.model = remove_last_layer_activation(self.model)
 
     def get_map(self, x, class_idx):
         """
