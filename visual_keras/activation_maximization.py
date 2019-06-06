@@ -2,36 +2,38 @@ import keras.backend as K
 import numpy as np
 
 
-def image_filter_maximizer(model, layer_name, filter_id, img_size=(224, 224, 3), lrate=25., reg=None, epochs=10,
+def image_filter_maximizer(model, layer_name, filter_id, img_size=(224, 224, 3), lrate=25., epochs=10, reg=None,
                            disc_dead=False):
     """
-    Creates the rgb image that maximizes a given filter output, applying the method
-    described in 'Deep Inside Convolutional Networks: Visualising
-    Image Classification Models and Saliency Maps'.
-    The image informally shows what type of information the filter is trying to
-    capture.
+    Creates the rgb image that maximizes a given filter output, applying the method described in:
+    "Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps"
+    Karen Simonyan, Andrea Vedaldi, Andrew Zisserman, 2014
+    The image shows what type of information the filter is trying to capture.
 
-    Parameters:
-
-    model: keras.engine.training.Model.
+    Parameters
+    ----------
+    model : keras.engine.training.Model
         Keras model
-    layer_names: string
-        Names of layer to be visualized.
-    filter_id: int
-        Id of filter/neuron to be visualized.
-    img_size: (int, int, int)
-        size of image to be created (hieght, width, channels)
-    lrate: float, optional
-        learning rate of SGD (default 1)
-    epochs: int
-        number of epochs for SGD (default 10)
-    disc_dead: boolean
-        if true returns None when the activation is dead (zero valued)
+    layer_name : string
+        Name of layer to be visualized
+    filter_id : int
+        Id of filter/neuron to be visualized
+    img_size : (int, int, int)
+        size of image to be created (height, width, channels) (default is (224, 244, 3))
+    lrate : float
+        learning rate for SGD (default is 25)
+    epochs : int
+        number of epochs for SGD (default is 10)
+    reg : int
+        Coefficient for L2 regularization. If None, no regularization is applied (default is None)
+    disc_dead : boolean
+        if True returns None when the activation is dead. i.e zero valued (default is False)
 
-    Returns:
-
+    Returns
+    -------
     Image that maximizes the given filter.
     """
+
     (H, W, C) = img_size
     layer_dims = len(model.get_layer(layer_name).output_shape)
 
