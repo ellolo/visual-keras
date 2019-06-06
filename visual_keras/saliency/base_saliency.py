@@ -7,8 +7,39 @@ from ..utils import floats_to_pixels_standardized
 
 
 class BaseSaliencyMap(AbstractSaliencyMap):
+    """
+    Class that computes vanilla saliency map for a given image tensor, as described in:
+    "Deep Inside Convolutional Networks: VisualisingImage Classification Models and Saliency Maps"
+    Karen Simonyan, Andrea Vedaldi, Andrew Zisserman, 2014
+
+    Attributes
+    ----------
+    model : keras.engine.training.Model
+        Keras model
+    layer_name : string
+        Name of layer to compute saliency map for. Typically this is the input (default is None)
+    multiply : boolean
+        if True if will multiply the map by the input image (default is False)
+    """
     
     def __init__(self, model, layer_name=None, multiply=False):
+        """
+        Parameters
+        ----------
+        model : keras.engine.training.Model
+            Keras model
+        layer_name : string
+            Name of layer to compute saliency map for. If left to None it uses the input layer.
+            Typically this is the input (default is None)
+        multiply : boolean
+        if True if will multiply the map by the input image (default is False)
+
+        Raises
+        ------
+        ValueError
+            If layer_name does not refer to either a conv or pool layer
+        """
+
         if layer_name is not None:
             layer = model.get_layer(layer_name)
             if not isinstance(layer, Conv2D) and not isinstance(layer, _Pooling2D):
@@ -22,25 +53,20 @@ class BaseSaliencyMap(AbstractSaliencyMap):
 
     def get_map(self, x, class_idx):
         """
-        Compute saliency map for a given image tensor, as described in:
-        "Deep Inside Convolutional Networks: VisualisingImage Classification Models and Saliency Maps"
-        Karen Simonyan, Andrea Vedaldi, Andrew Zisserman, 2014
+        Computes saliency map for a given image tensor and class index.
 
-        Parameters:
+        Parameters
+        ----------
+        x : numpy.array
+            Input image as a numpy array, already preprocessed for the target network model. Shape is: (batch, h, w, c)
+        class_idx : int
+            Index of the class in the final prediction layer for which to compute saliency
 
-        modell: keras.engine.training.Model.
-            Keras model
-        layer_name: string
-            Names of prediction layer.
-        class_idx: it
-            Index of the class for which to predict saliency
-        img_tensor: numpy.array of shape (batch, h, w, c)
-            Numpy array of the target image.
-
-        Returns:
-
+       Returns
+       -------
         Saliency map as a [0,255] bounded standardized numpy array.
         """
+
         if self.layer_is_image:
             layer = self.model.input
         else:

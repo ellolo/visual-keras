@@ -7,8 +7,40 @@ from ..utils import floats_to_pixels_standardized, remove_last_layer_activation
 
 
 class GradCamMap(AbstractSaliencyMap):
-    
+    """
+    Class that computes Grad-Cam saliency map for a given image tensor, as described in:
+    "Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization"
+    R. R. Selvaraju, M. Cogswell, A. Das, R. Vedantam, D. Parikh, D. Batra, 2017
+
+    Attributes
+    ----------
+    model : keras.engine.training.Model
+        Keras model
+    layer_name : string
+        Name of layer to compute saliency map for. Typically this is the input (default is None)
+
+    multiply : boolean
+        if True if will multiply the map by the input image (default is False)
+    """
+
     def __init__(self, model, layer_name=None, multiply=False):
+        """
+         Parameters
+         ----------
+         model : keras.engine.training.Model
+             Keras model
+         layer_name : string
+             Name of layer to compute saliency map for. If left to None it uses the input layer.
+             Typically this is the input (default is None)
+         multiply : boolean
+             if True if will multiply the map by the input image (default is False)
+
+         Raises
+         ------
+         ValueError
+             If layer_name does not refer to either a conv or pool layer
+         """
+
         if layer_name is not None:
             layer = model.get_layer(layer_name)
             if not isinstance(layer, Conv2D) and not isinstance(layer, _Pooling2D):
@@ -26,21 +58,20 @@ class GradCamMap(AbstractSaliencyMap):
 
     def get_map(self, x, class_idx):
         """
-        Compute grad-cam map for a given image tensor.
-        
-        Parameters:
-    
-        modell: keras.engine.training.Model.
-            Keras model
-        layer_name: string
-            Names of layer over which to compute grad-cam map.
-        img_tensor: numpy.array
-            Numpy array of the target image.
+        Computes saliency map for a given image tensor and class index.
 
-        Returns:
-    
-        grad-cam map as a [0,255] bounded standardized numpy array.
+        Parameters
+        ----------
+        x : numpy.array
+            Input image as a numpy array, already preprocessed for the target network model. Shape is: (batch, h, w, c)
+        class_idx : int
+            Index of the class in the final prediction layer for which to compute saliency
+
+       Returns
+       -------
+        Saliency map as a [0,255] bounded standardized numpy array.
         """
+
         if self.layer_is_image:
             layer = self.model.input
         else:
