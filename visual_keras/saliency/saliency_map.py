@@ -1,5 +1,7 @@
-from abc import ABC, abstractmethod 
+import abc
+from abc import abstractmethod
 
+ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})  # for compatibility to both Python 2 and 3
 
 class AbstractSaliencyMap(ABC):
     """
