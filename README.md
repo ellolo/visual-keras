@@ -23,6 +23,15 @@ This library is compatible and has been tested with python 3.7 and python 2.7.
 ## Usage
 Please refer to the Juptyer notebook for example usage.
 
+## Required python packages
+
+* tensorflow
+* keras 
+* pillow
+* matplotlib
+* sklearn
+
+
 ## References
 
 [1] M. D. Zeiler, R. Fergus. _Visualizing and Understanding Convolutional Networks_. https://arxiv.org/abs/1311.2901
