@@ -18,6 +18,7 @@ def compute_knn(query_vecs, index_vecs, k=5):
 
     Returns
     -------
+    numpy.array
         Array of the indexes of the top k in the index_vecs. Array is sorted by descending similarity
     """
 

@@ -31,7 +31,8 @@ def image_filter_maximizer(model, layer_name, filter_id, img_size=(224, 224, 3),
 
     Returns
     -------
-    Image that maximizes the given filter.
+    numpy.array
+        Image that maximizes the given filter.
     """
 
     (H, W, C) = img_size

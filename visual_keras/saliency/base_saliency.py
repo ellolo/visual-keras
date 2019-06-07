@@ -64,8 +64,9 @@ class BaseSaliencyMap(AbstractSaliencyMap):
 
        Returns
        -------
-        Saliency map as a [0,255] bounded standardized numpy array.
-        """
+       numpy.array
+           Saliency map as a [0,255] bounded standardized numpy array.
+       """
 
         if self.layer_is_image:
             layer = self.model.input

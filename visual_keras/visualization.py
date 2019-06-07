@@ -15,18 +15,24 @@ from visual_keras.knn import compute_knn
 def viz_conv_filters(model, layer_names, fig_size=None):
     """
     Visualizes the weights of convolutional filters using matplotlib.
-    If a filter has 3 input channels, the weights are visulized as rgb images, otherwise as
-    a n grayscale images, where n is the number of channels.
+    If a filter has 3 input channels, the weights are visualized as rgb images, otherwise as a N grayscale images,
+    where N is the number of channels.
 
-    Parameters:
-
-    modell: keras.engine.training.Model.
+    Parameters
+    ----------
+    model : keras.Model
         Keras model
-    layer_names: list
-        List of conv layer names to be visualized. An image will be created for each layer.
-    fig_size: (int,int)
-        width and height of the output figure in pixel.
+    layer_names : list
+        List of conv layer names to be visualized. An image will be created for each layer
+    fig_size : tuple
+        A tuple (width, height) of the displayed figure in pixels. If None size will be inferred (default is None)
+
+    Raises
+    ------
+    ValueError
+        if a layer name does not refer to a layer with class Conv2
     """
+
     if fig_size is None:
         fig_size = (20, 20 * len(layer_names))
     fig = plt.figure(figsize=fig_size)
@@ -55,18 +61,25 @@ def viz_conv_filters(model, layer_names, fig_size=None):
 
 def viz_activations(image_path, model, layer_names, img_size=(224, 224), f_preproc=None, fig_size=None):
     """
-    Visualizes the output of layers as activated by an input image using matplotlib.
+    Visualizes the output of convolutional abnd pooling layers as activated by an input image using matplotlib.
 
-    Parameters:
-    image: numpy.array
-        image for which to compute activations
-    modell: keras.engine.training.Model.
+    Parameters
+    ----------
+    image_path : String
+        Path of the image for which to compute activations
+    model : keras.Model
         Keras model
     layer_names: list
-        List of conv layer names to be visualized. An image will be created for each layer.
-    fig_size: (int,int)
-        width and height of the output figure in pixel.
+        List of conv/pooling layer names to be visualized. An image will be created for each layer
+    img_size : tuple
+        tuple (height, width) to which the input image will be rescaled before running in the model (default
+        is (224, 224))
+    f_preproc : function
+        preprocessing function to be applied to the image before running in the model (default is None)
+    fig_size: tuple
+        tuple (width, height) of the output figure in pixels. If None size will be inferred (default is None)
     """
+
     if fig_size is None:
         fig_size = (10, 10 * len(layer_names))
     x = preproc_image(image_path, f_preproc=f_preproc, img_size=img_size)
@@ -92,6 +105,31 @@ def viz_activations(image_path, model, layer_names, img_size=(224, 224), f_prepr
 
 def viz_nearest_neighbors(q_paths, i_paths, model, layer_name, k=8, img_size=(224, 224, 3), f_preproc=None,
                           fig_size=(20, 20)):
+    """
+    Given an input list of query images, returns for each query image the top-k most similar images from the list of
+    index images. Similarity is computed on the vectors outputted by a given layer of the model's network.
+    Euclidean distance is used as similarity measure
+
+    Parameters
+    ----------
+    q_paths : list
+        List of paths for the query images
+    i_paths : list
+        List of paths for the index images
+    model: keras.Model
+        Keras model for the network
+    layer_name : String
+        name of the network layer whose output will be used to compute similarity
+    k : int
+        Number of most similar index images to be returned for each query image (default is 8)
+    img_size : tuple
+        Image size (height, width, channels) to be displayed (default is (224, 224, 3))
+    f_preproc : function
+        preprocessing function to be applied to the image before running in the model (default is None)
+    fig_size: tuple
+        tuple (width, height) of the output figure in pixels. If None size will be inferred (default is (20, 20))
+    """
+
     out_dim = reduce(lambda a, b: a * b, model.get_layer(layer_name).output_shape[1:])
     q_vecs = np.zeros((len(q_paths), out_dim))
     i_vecs = np.zeros((len(i_paths), out_dim))
@@ -134,40 +172,37 @@ def viz_nearest_neighbors(q_paths, i_paths, model, layer_name, k=8, img_size=(22
     plt.show()
 
 
-def viz_class_score_maximizer(model, class_idx, img_size=(224, 224, 3), fig_size=(10, 10), reg=None,
-                              lrate=1., epochs=10, disc_dead=False, layer_name=None, remove_activation=True):
+def viz_class_score_maximizer(model, class_idx, img_size=(224, 224, 3), lrate=1., epochs=10, reg=None, disc_dead=False,
+                              layer_name=None, remove_activation=True, fig_size=(10, 10)):
     """
-    Visulizes rgb images. Each imge maximizes the score of a given class,
-    applying the method described in 'Deep Inside Convolutional Networks: Visualising
-    Image Classification Models and Saliency Maps'.
-    The layer_name must be the last layer, or preferablz the layer right before the final sigmoid or soft-max layer.
-    The images informally shows what type of information a filter is trying to capture.
+    Visualizes the synthetic rgb image that maximizes the score of a given class, applying the method described in
+    "Deep Inside Convolutional Networks: VisualisingImage Classification Models and Saliency Maps"
+    Karen Simonyan, Andrea Vedaldi, Andrew Zisserman, 2014
 
-    Parameters:
-
-    model: keras.engine.training.Model.
+    Parameters
+    ----------
+    model : keras.Model
         Keras model
-    layer_name: string
-        Names of layer to be visualized. This needs to be the layer right before the final
-        sigmoid or soft-max activation.
-    class_idx: int
-        Index in the last dense layer of the target class
-    img_size: (int, int, int)
-        size of imge to be created (hieght, width, channels)
-    fig_size: (int,int)
-        width and height of the output figure in pixel.
-    lrate: float, optional
-        learning rate of SGD (default 1)
-    epochs: int
-        number of epochs for SGD (default 10)
-    disc_dead: boolean
-        if true discards dead activation (resulting in random images) in the display
-
-    Returns:
-
-    Image that maximizes the given filter.
-
+    class_idx : int
+        Index of the target class in the last dense layer
+    img_size : tuple
+        Size of image to be created (height, width, channels)
+    lrate : float
+        learning rate for SGD (default is 25)
+    epochs : int
+        number of epochs for SGD (default is 10)
+    reg : int
+        Coefficient for L2 regularization. If None, no regularization is applied (default is None)
+    disc_dead : boolean
+        If True returns None when the activation is dead. i.e zero valued (default is False)
+    layer_name : String
+        Name of the last dense layer. If None the last layer of the model will be used (default is None)
+    remove_activation : boolean
+        If True (recommended) the activation of the last layer will be removed, giving optimal results (default is True)
+    fig_size : tuple
+        (width, height) of the output figure in pixel
     """
+
     if remove_activation:
         model = remove_last_layer_activation(model)
 
@@ -186,37 +221,33 @@ def viz_class_score_maximizer(model, class_idx, img_size=(224, 224, 3), fig_size
     plt.show()
 
 
-def viz_layer_maximizers(model, layer_name, img_size=(224, 224, 3), filters=None, fig_size=(20, 20), lrate=1.,
-                         reg=None,
-                         epochs=10, disc_dead=False):
+def viz_layer_maximizers(model, layer_name, img_size=(224, 224, 3), filters=None, lrate=1., epochs=10, reg=None,
+                         disc_dead=False, fig_size=(20, 20)):
     """
-    Visulizes rgb images. Each image maximizes a filter of the given layer,
-    applying the method described in 'Deep Inside Convolutional Networks: Visualising
-    Image Classification Models and Saliency Maps'.
-    The images informally shows what type of information a filter is trying to capture.
-    This function works for both convolutional and dense layers.
+    Visualizes the synthetic rgb images that maximize the filters of the given layer, applying the method described in
+    "Deep Inside Convolutional Networks: VisualisingImage Classification Models and Saliency Maps"
+    Karen Simonyan, Andrea Vedaldi, Andrew Zisserman, 2014
 
-    Parameters:
-
-    modell: keras.engine.training.Model.
+    Parameters
+    ----------
+    model : keras.Model
         Keras model
-    layer_name: string
-        Names of layer to be visualized.
-    img_size: (int, int, int)
-        size of image to be created (hieght, width, channels)
-    fig_size: (int,int)
-        width and height of the output figure in pixel.
-    lrate: float, optional
-        learning rate of SGD (default 1)
-    epochs: int
-        number of epochs for SGD (default 10)
-    disc_dead: boolean
-        if true discards dead activation (resulting in random images) in the display
-
-    Returns:
-
-    Image that maximizes the given filter.
-
+    layer_name : String
+        Name of the target layer
+    img_size : tuple
+        Size of image to be created (height, width, channels)
+    filters: list
+        Indexes of the filters in the target layer that the image will be displayed for
+    lrate : float
+        learning rate for SGD (default is 25)
+    epochs : int
+        number of epochs for SGD (default is 10)
+    reg : int
+        Coefficient for L2 regularization. If None, no regularization is applied (default is None)
+    disc_dead : boolean
+        If True returns None when the activation is dead. i.e zero valued (default is False)
+    fig_size : tuple
+        (width, height) of the output figure in pixel
     """
 
     if filters is None:
@@ -242,24 +273,48 @@ def viz_layer_maximizers(model, layer_name, img_size=(224, 224, 3), filters=None
 def viz_saliency_map(image_path, model, class_idx, img_size=(224, 224, 3), f_preproc=None, variant="vanilla",
                      layer_name=None, spread=0.20, samples=50, multiply=False, blend=False, pair=False):
     """
-    Visualizes the saliency map for an input image over with respect to a specified layer.
-    As described in:
+    Visualizes the saliency map for an input image with respect to a specified class. As described in:
     "Deep Inside Convolutional Networks: VisualisingImage Classification Models and Saliency Maps"
     Karen Simonyan, Andrea Vedaldi, Andrew Zisserman, 2014
 
-    Parameters:
-
-    image_path: string
+    Parameters
+    ----------
+    image_path : string
         Path of the image
-    modell: keras.engine.training.Model.
+    model : keras.Model
         Keras model
-    img_size: (int, int, int)
-        Size of image to be passed to modell (hieght, width, channels).
-    fig_size: (int,int)
-        Width and height of the output figure in pixel.
-    blend: boolean
-        If true visualizes a blend of the target image and the salency map.
-        Otherwise only the saliency map
+    class_idx : int
+        Index of the target class in the last dense layer
+    img_size : tuple
+        Tuple (height, width, channels) to which the input image will be rescaled before running in the model (default
+        is (224, 224))
+    f_preproc : function
+        preprocessing function to be applied to the image before running in the model (default is None)
+    variant: String
+        Yype of saliency map to be applied. Possible values are:
+            vanilla: as described in:
+                "Deep Inside Convolutional Networks: VisualisingImage Classification Models and Saliency Maps"
+            smooth: as described in:
+                "SmoothGrad: removing noise by adding noise"
+            integated: as in:
+                "Axiomatic Attribution for Deep Networks"
+            gradcam: as described in:
+                 "Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization"
+    layer_name : String
+        Name of the layer for which saliency map will be visualized (only available for variants "vanilla" and
+        "gradcam"). If None input layer will be used (default is None)
+    spread : float
+        controls the magnitude of the standard deviation of gaussian noise to be applied for variant "smooth"
+        (suggested value >0.1 <0.2) (default is 0.2)
+    samples : int
+        number of saliency maps to compute and to average from (suggested value <50) for variants "smooth" and
+        "integrated" (default is 50)
+    multiply : boolean
+        If True if will multiply the map by the input image (default is False)
+    blend : boolean
+        If true visualizes a blend of the target image and the salency map (default is False)
+    pair : boolean
+        If true visualizes the target image on the left and the salency map on the right (default is False)
     """
 
     x = preproc_image(image_path, img_size=img_size, f_preproc=f_preproc)

@@ -39,7 +39,7 @@ class SmoothGradMap(AbstractSaliencyMap):
             Input image as a numpy array, already preprocessed for the target network model. Shape is: (batch, h, w, c)
         class_idx : int
             Index of the class in the final prediction layer for which to compute saliency
-        spread : int
+        spread : float
             controls the magnitude of the standard deviation of gaussian noise (suggested value >0.1 <0.2)
             (default is 0.2)
         samples : int
@@ -47,8 +47,9 @@ class SmoothGradMap(AbstractSaliencyMap):
 
        Returns
        -------
-        Saliency map as a [0,255] bounded standardized numpy array.
-        """
+       numpy.array
+           Saliency map as a [0,255] bounded standardized numpy array.
+    """
 
         stdev = spread * (np.max(x) - np.min(x))
         smap = np.zeros(x.shape[1:3])

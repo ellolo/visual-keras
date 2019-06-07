@@ -44,8 +44,9 @@ class IntegratedGradientMap(AbstractSaliencyMap):
 
        Returns
        -------
-        Saliency map as a [0,255] bounded standardized numpy array.
-        """
+       numpy.array
+            Saliency map as a [0,255] bounded standardized numpy array.
+       """
 
         baseline = np.zeros(x.shape)
         diff = x - baseline
