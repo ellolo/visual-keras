@@ -6,15 +6,20 @@ The library currently supports the following techniques:
 * Visualization of convolutional and pooling filters [1]
 * Visualization of convolutional and pooling activations
 * Nearest neighbors in feature space [2]
-* Class image generation [3]
+* Maximal image generation [3]
 * Vanilla saliency maps [3]
 * Smooth Grad saliency maps [4]
 * Integrated Gradients saliency maps [5]
 * Grad-CAM saliency maps [6]
 
-## Usage
+Some of these techniques are only applicable to convolutional network and layers. This is spelled out explicitly in the documentation.
 
-## Examples
+The _visualization.py_ module contains functions to directly display the output each of the above technique using matplotlib.
+In alternative, the package _saliency_ and the module _activation_maximization_ can be used to obtain raw saliency maps
+and  maximal images as numpy array.
+
+## Usage
+Please refer to the Juptyer notebook for example usage.
 
 ## References
 
@@ -22,7 +27,7 @@ The library currently supports the following techniques:
 
 [2] A. Krizhevsky , I. Sutskever , G. E. Hinton. _Imagenet classification with deep convolutional neural networks_. https://dl.acm.org/citation.cfm?id=3065386
 
-[3] K. Simonyan, A. Vedaldi, A. Zisserman. _Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps_. https://arxiv.org/abs/1312.6034
+[3] K. Simonyan, A. Vedaldi, A. Zisserman. _Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps. https://arxiv.org/abs/1312.6034
 
 [4] D. Smilkov, N. Thorat, B. Kim, F. Viégas, M. Wattenberg. _SmoothGrad: removing noise by adding noise_. https://arxiv.org/abs/1706.03825
 
