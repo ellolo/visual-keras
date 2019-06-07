@@ -7,7 +7,7 @@ class SmoothGradMap(AbstractSaliencyMap):
     """
     Class that computes Smmoth Grad saliency map for a given image tensor, as described in:
     "SmoothGrad: removing noise by adding noise"
-     D. Smilkov, N. Thorat, B. Kim, F. Viégas, M. Wattenberg, 2017
+     D. Smilkov, N. Thorat, B. Kim, F. Viegas, M. Wattenberg, 2017
 
     Attributes
     ----------
