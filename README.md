@@ -14,7 +14,7 @@ The library currently supports the following techniques:
 
 Some of these techniques are only applicable to convolutional network and layers. This is spelled out explicitly in the documentation.
 
-The _visualization.py_ module contains functions to directly display the output each of the above technique using matplotlib.
+The _visualization.py_ module contains functions to directly display the output of each of the above technique using matplotlib.
 In alternative, the package _saliency_ and the module _activation_maximization_ can be used to obtain raw saliency maps
 and  maximal images as numpy array.
 
