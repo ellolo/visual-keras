@@ -18,6 +18,8 @@ The _visualization.py_ module contains functions to directly display the output 
 In alternative, the package _saliency_ and the module _activation_maximization_ can be used to obtain raw saliency maps
 and  maximal images as numpy array.
 
+This library is compatible and has been tested with python 3.7 and python 2.7.
+
 ## Usage
 Please refer to the Juptyer notebook for example usage.
 
